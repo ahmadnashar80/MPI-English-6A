@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Family Time Machine - Interactive English Learning Media</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#15365B',
+                        mediumBlue: '#477DB3',
+                        softBlue: '#E5F1FF',
+                        warmCream: '#FFF1CF',
+                        coralSoft: '#FF8A8A',
+                        successGreen: '#2ECC71'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .slide-up { animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp {
+            from { transform: translateY(15px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #E5F1FF; }
+        ::-webkit-scrollbar-thumb { background: #477DB3; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-softBlue text-navy min-h-screen flex flex-col selection:bg-mediumBlue selection:text-white">
+
+    <!-- Top Navigation Header -->
+    <header id="mainHeader" class="bg-navy text-white shadow-md sticky top-0 z-40 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="app.navigateTo(0)">
+                <div class="bg-mediumBlue p-2.5 rounded-xl shadow-inner text-white text-xl flex items-center justify-center">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight tracking-wide">THE FAMILY TIME MACHINE</h1>
+                    <p class="text-xs text-warmCream font-medium">Grade 8 English | 50-Min Lesson Media</p>
+                </div>
+            </div>
+
+            <!-- Quick Module Navigation Bar -->
+            <nav class="hidden lg:flex items-center space-x-1 bg-white/10 p-1 rounded-xl text-xs font-semibold overflow-x-auto">
+                <button onclick="app.navigateTo(0)" class="nav-btn px-3 py-1.5 rounded-lg transition hover:bg-white/20" data-mod="0">Home</button>
+                <button onclick="app.navigateTo(1)" class="nav-btn px-3 py-1.5 rounded-lg transition hover:bg-white/20" data-mod="1">1. Vocab</button>
+                <button onclick="app.navigateTo(2)" class="nav-btn px-3 py-1.5 rounded-lg transition hover:bg-white/20" data-mod="2">2. Tree</button>
+                <button onclick="app.navigateTo(3)" class="nav-btn px-3 py-1.5 rounded-lg transition hover:bg-white/20" data-mod="3">3. Listening</button>
+                <button onclick="app.navigateTo(4)" class="nav-btn px-3 py-1.5 rounded-lg transition hover:bg-white/20" data-mod="4">4. Grammar</button>
+                <button onclick="app.navigateTo(5)" class="nav-btn px-3 py-1.5 rounded-lg transition hover:bg-white/20" data-mod="5">5. Years</button>
+                <button onclick="app.navigateTo(6)" class="nav-btn px-3 py-1.5 rounded-lg transition hover:bg-white/20" data-mod="6">6. Speaking</button>
+                <button onclick="app.navigateTo(7)" class="nav-btn px-3 py-1.5 rounded-lg transition hover:bg-white/20" data-mod="7">7. Challenge</button>
+                <button onclick="app.navigateTo(8)" class="nav-btn px-3 py-1.5 rounded-lg transition hover:bg-white/20" data-mod="8">8. Summary</button>
+            </nav>
+
+            <!-- Mode Controls -->
+            <div class="flex items-center space-x-2">
+                <button onclick="app.toggleTeacherMode()" class="bg-warmCream text-navy font-bold px-3 py-1.5 rounded-xl text-xs hover:bg-amber-300 transition shadow flex items-center gap-1.5">
+                    <i class="fa-solid fa-chalkboard-user"></i> <span id="teacherModeBtnText">Teacher Mode</span>
+                </button>
+                <button onclick="app.togglePresentMode()" id="presentModeBtn" class="bg-mediumBlue text-white font-bold px-3 py-1.5 rounded-xl text-xs hover:bg-blue-600 transition shadow flex items-center gap-1.5">
+                    <i class="fa-solid fa-expand"></i> <span id="presentModeBtnText">Present</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main App Container -->
+    <div class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 flex flex-col">
+
+        <!-- Time & Progress Indicator Bar -->
+        <div id="statusBar" class="bg-white rounded-2xl p-4 shadow-sm mb-6 flex flex-col md:flex-row items-center justify-between gap-4 border border-blue-100">
+            <div class="flex items-center space-x-3">
+                <div id="moduleBadge" class="bg-mediumBlue text-white font-bold px-3 py-1 rounded-xl text-xs">
+                    Module 0 / 8
+                </div>
+                <div>
+                    <h2 id="moduleTitleHeader" class="font-bold text-navy text-base md:text-lg">Welcome to The Family Time Machine</h2>
+                    <p id="moduleTimeHeader" class="text-xs text-gray-500 font-medium"><i class="fa-regular fa-clock mr-1"></i> Estimated Time: 0 min</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 w-full md:w-auto justify-end">
+                <button onclick="app.prevModule()" id="prevBtn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-xl text-xs font-bold hover:bg-gray-300 transition flex items-center gap-1">
+                    <i class="fa-solid fa-arrow-left"></i> Previous
+                </button>
+                <button onclick="app.stopSpeaking()" class="px-4 py-2 rounded-xl border border-blue-200 text-navy bg-white hover:bg-blue-50 text-xs font-bold" title="Stop audio"><i class="fa-solid fa-stop mr-1"></i> Stop Audio</button>
+                <button onclick="app.nextModule()" id="nextBtn" class="px-4 py-2 bg-mediumBlue text-white rounded-xl text-xs font-bold hover:bg-blue-600 transition flex items-center gap-1 shadow">
+                    Next <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <main id="mainContent" class="flex-1 flex flex-col">
+            <!-- Dynamically rendered via JS -->
+        </main>
+    </div>
+
+    <!-- Teacher Mode Drawer / Modal -->
+    <div id="teacherModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden slide-up border-4 border-mediumBlue">
+            <div class="bg-navy text-white p-4 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-chalkboard-user text-warmCream text-xl"></i>
+                    <h3 class="font-bold text-lg">Teacher Mode & Lesson Notes</h3>
+                </div>
+                <button onclick="app.toggleTeacherMode()" class="text-white hover:text-warmCream text-lg font-bold px-2 py-1">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div id="teacherModalContent" class="p-6 overflow-y-auto space-y-4 text-sm text-gray-700">
+                <!-- Populated dynamically per module -->
+            </div>
+            <div class="bg-gray-50 p-4 border-t flex justify-end">
+                <button onclick="app.toggleTeacherMode()" class="bg-navy text-white px-5 py-2 rounded-xl text-xs font-bold hover:bg-blue-900 transition">Close Guide</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification / Message Box (Custom alert replacement) -->
+    <div id="messageModal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl slide-up text-center border-t-8 border-mediumBlue">
+            <div id="msgIcon" class="text-4xl text-mediumBlue mb-3"><i class="fa-solid fa-circle-info"></i></div>
+            <h4 id="msgTitle" class="font-bold text-lg text-navy mb-2">Notice</h4>
+            <p id="msgBody" class="text-sm text-gray-600 mb-6">Message goes here.</p>
+            <button onclick="app.closeMessage()" class="w-full bg-navy text-white py-2.5 rounded-xl font-bold text-sm hover:bg-blue-900 transition shadow">Got It</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-navy text-white/70 py-4 text-center text-xs border-t border-white/10 mt-8">
+        <p>The Family Time Machine | Designed for Grade 8 Regular English (50-Minute Lesson)</p>
+    </footer>
+
+    <!-- Application Logic Script -->
+    <script>
+        // Application State
+        const state = {
+            currentModule: 0,
+            presentMode: false,
+            teacherModeOpen: false,
+            quizScore: 0,
+            quizAnswers: {},
+            quizSubmitted: false,
+            vocabMatched: {},
+            grammarAnswers: { l1: {}, l2: {}, l3: {} },
+            listeningRevealed: false,
+            yearRevealed: {}
+        };
+
+        // Comprehensive Fictional Family Tree Data & Relationships
+        const familyMembers = [
+            { id: 'nathan', name: 'Nathan', relation: 'Grandfather / Husband', desc: 'Nathan is Sally\'s husband. He was a photographer in his youth.', details: 'Nathan was born in 1945. He loves taking photos of his family.' },
+            { id: 'sally', name: 'Sally', relation: 'Grandmother / Wife', desc: 'Sally is Nathan\'s wife. She was a doctor.', details: 'Sally and Nathan were married in 1968.' },
+            { id: 'mary', name: 'Mary', relation: 'Mother / Daughter', desc: 'Mary is Nathan and Sally\'s daughter. Greg\'s mother.', details: 'Mary is married to Michael. She is Greg and Ella\'s mother.' },
+            { id: 'michael', name: 'Michael', relation: 'Father / Husband', desc: 'Michael is Mary\'s husband. Greg and Ella\'s father.', details: 'Michael works as an engineer. He was born in 1970.' },
+            { id: 'greg', name: 'Greg', relation: 'Son / Brother', desc: 'Greg is Mary and Michael\'s son. Ella\'s brother.', details: 'Greg is a student in Grade 8. He likes history.' },
+            { id: 'ella', name: 'Ella', relation: 'Daughter / Sister', desc: 'Ella is Mary and Michael\'s daughter. Greg\'s sister.', details: 'Ella is Greg\'s younger sister. She loves reading.' },
+            { id: 'rick', name: 'Rick', relation: 'Cousin', desc: 'Rick is Greg and Ella\'s cousin. Aunt Alice\'s son.', details: 'Rick was born in 2011. He loves playing football.' },
+            { id: 'alice', name: 'Alice', relation: 'Aunt', desc: 'Alice is Nathan and Sally\'s daughter, Mary\'s sister.', details: 'Alice is Rick\'s mother and Greg\'s aunt.' },
+            { id: 'simone', name: 'Simone', relation: 'Uncle (by marriage)', desc: 'Simone is Alice\'s husband.', details: 'Simone is an architect from Italy.' },
+            { id: 'alessio', name: 'Alessio', relation: 'Cousin', desc: 'Alessio is Alice and Simone\'s son.', details: 'Alessio is Rick\'s brother.' },
+            { id: 'hugo', name: 'Hugo', relation: 'Grandson / Nephew', desc: 'Hugo is part of the younger generation.', details: 'A lively young family member.' },
+            { id: 'olivia', name: 'Olivia', relation: 'Granddaughter', desc: 'Olivia is part of the younger generation.', details: 'A cheerful member of the family.' }
+        ];
+
+        // Modules Definition
+        const modules = [
+            {
+                title: "Home: The Time Machine",
+                subtitle: "Discover Families, Travel Through Time!",
+                time: "0 min (Introduction)",
+                teacherNotes: `
+                    <h4 class="font-bold text-navy mb-1">Teacher Guide: Introduction (0-2 mins)</h4>
+                    <p class="mb-2">Greet students and introduce the lesson theme: families and the past. Explain that today students will become <strong>Family Time Detectives</strong>.</p>
+                    <p>Emphasize that all learning materials, exercises, and audio dictation scripts are fully contained within this web media.</p>
+                `,
+                render: () => `
+                    <div class="bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-blue-100 flex flex-col items-center text-center space-y-6 slide-up">
+                        <div class="w-24 h-24 bg-gradient-to-br from-navy to-mediumBlue rounded-3xl flex items-center justify-center text-white text-5xl shadow-lg">
+                            <i class="fa-solid fa-hourglass-start animate-pulse"></i>
+                        </div>
+                        <div class="max-w-2xl space-y-3">
+                            <span class="bg-warmCream text-navy font-bold px-3 py-1 rounded-full text-xs uppercase tracking-wider">Grade 8 English Learning Media</span>
+                            <h2 class="text-3xl md:text-4xl font-extrabold text-navy">THE FAMILY TIME MACHINE</h2>
+                            <p class="text-base text-mediumBlue font-semibold">Discover Families, Travel Through Time!</p>
+                            <p class="text-gray-600 text-sm leading-relaxed bg-softBlue p-4 rounded-2xl border border-blue-200">
+                                "Welcome, Detective! Your mission is to explore a family tree, discover stories from the past, and travel through important years. Complete every mission to become a Family Time Detective!"
+                            </p>
+                        </div>
+
+                        <!-- Progress Stages -->
+                        <div class="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-left">
+                            <div class="bg-softBlue p-3 rounded-2xl border border-blue-200 flex items-center space-x-3">
+                                <div class="bg-mediumBlue text-white w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs shrink-0">1</div>
+                                <div class="text-xs font-semibold text-navy">Meet the Family (Vocab)</div>
+                            </div>
+                            <div class="bg-softBlue p-3 rounded-2xl border border-blue-200 flex items-center space-x-3">
+                                <div class="bg-mediumBlue text-white w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs shrink-0">2</div>
+                                <div class="text-xs font-semibold text-navy">Family Tree Detective</div>
+                            </div>
+                            <div class="bg-softBlue p-3 rounded-2xl border border-blue-200 flex items-center space-x-3">
+                                <div class="bg-mediumBlue text-white w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs shrink-0">3</div>
+                                <div class="text-xs font-semibold text-navy">Listening Mission</div>
+                            </div>
+                            <div class="bg-softBlue p-3 rounded-2xl border border-blue-200 flex items-center space-x-3">
+                                <div class="bg-mediumBlue text-white w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs shrink-0">4</div>
+                                <div class="text-xs font-semibold text-navy">Master Was & Were</div>
+                            </div>
+                            <div class="bg-softBlue p-3 rounded-2xl border border-blue-200 flex items-center space-x-3">
+                                <div class="bg-mediumBlue text-white w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs shrink-0">5</div>
+                                <div class="text-xs font-semibold text-navy">Time & Final Challenge</div>
+                            </div>
+                        </div>
+
+                        <button onclick="app.navigateTo(1)" class="bg-navy hover:bg-blue-900 text-white font-bold px-8 py-4 rounded-2xl text-base shadow-xl transition transform hover:-translate-y-0.5 flex items-center gap-3">
+                            <i class="fa-solid fa-play text-warmCream"></i> START THE MISSION
+                        </button>
+                    </div>
+                `
+            },
+            {
+                title: "Module 1: Family Vocabulary",
+                subtitle: "Learn and master core family relationship terms",
+                time: "5 minutes",
+                teacherNotes: `
+                    <h4 class="font-bold text-navy mb-1">Teacher Guide: Family Vocabulary (5 mins)</h4>
+                    <p class="mb-2">Review vocabulary categories with students (Nuclear family, Grandparents, Extended family). Click cards to reveal Indonesian translations.</p>
+                    <p>Have students practice pronunciation out loud in chorus.</p>
+                `,
+                render: () => {
+                    const vocabList = [
+                        { en: "father", id: "ayah", cat: "Nuclear Family", ex: "Nathan is Sally's husband." },
+                        { en: "mother", id: "ibu", cat: "Nuclear Family", ex: "Mary is Michael's wife." },
+                        { en: "parents", id: "orang tua", cat: "Nuclear Family", ex: "Nathan and Sally are parents." },
+                        { en: "son", id: "anak laki-laki", cat: "Nuclear Family", ex: "Greg is Mary's son." },
+                        { en: "daughter", id: "anak perempuan", cat: "Nuclear Family", ex: "Ella is Greg's sister." },
+                        { en: "brother", id: "saudara laki-laki", cat: "Siblings", ex: "Greg is Ella's brother." },
+                        { en: "sister", id: "saudara perempuan", cat: "Siblings", ex: "Ella is Greg's sister." },
+                        { en: "husband", id: "suami", cat: "Couples", ex: "Nathan is Sally's husband." },
+                        { en: "wife", id: "istri", cat: "Couples", ex: "Mary is Michael's wife." },
+                        { en: "grandfather", id: "kakek", cat: "Grandparents", ex: "Nathan is the grandfather." },
+                        { en: "grandmother", id: "nenek", cat: "Grandparents", ex: "Sally is the grandmother." },
+                        { en: "grandparents", id: "kakek dan nenek", cat: "Grandparents", ex: "Nathan and Sally are grandparents." },
+                        { en: "uncle", id: "paman", cat: "Extended Family", ex: "Simone is an uncle." },
+                        { en: "aunt", id: "bibi", cat: "Extended Family", ex: "Alice is Greg's aunt." },
+                        { en: "cousin", id: "sepupu", cat: "Extended Family", ex: "Rick is Greg's cousin." }
+                    ];
+
+                    return `
+                        <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-blue-100 space-y-6 slide-up">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4">
+                                <div>
+                                    <h3 class="text-xl font-extrabold text-navy">Core Family Vocabulary</h3>
+                                    <p class="text-xs text-gray-500">Click any card to flip and view the Indonesian translation and example sentence.</p>
+                                </div>
+                                <button onclick="app.showVocabQuickMatch()" class="bg-mediumBlue text-white font-bold px-4 py-2 rounded-xl text-xs hover:bg-blue-600 transition shadow">
+                                    <i class="fa-solid fa-gamepad mr-1"></i> Quick Match Activity
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="vocabGrid">
+                                ${vocabList.map((v, i) => `
+                                    <div onclick="app.flipVocab(${i})" id="vocabCard-${i}" class="bg-softBlue p-4 rounded-2xl border border-blue-200 cursor-pointer transition hover:shadow-md flex flex-col justify-between h-32 select-none relative group">
+                                        <div class="flex justify-between items-start">
+                                            <span class="bg-white/80 text-navy text-[10px] font-bold px-2 py-0.5 rounded-lg">${v.cat}</span>
+                                            <i class="fa-solid fa-rotate text-gray-400 text-xs"></i>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="flex items-center justify-center gap-2"><h4 class="text-lg font-extrabold text-navy" id="vocabText-${i}">${v.en}</h4><button type="button" aria-label="Listen to ${v.en}" title="Listen to pronunciation" onclick="event.stopPropagation(); app.speak(&quot;${v.en}&quot;)" class="bg-white text-mediumBlue rounded-full w-7 h-7 shadow-sm hover:bg-blue-100"><i class="fa-solid fa-volume-high text-xs"></i></button></div>
+                                            <p class="text-xs text-mediumBlue font-semibold hidden" id="vocabSub-${i}">${v.id}</p>
+                                        </div>
+                                        <p class="text-[11px] text-gray-600 italic text-center truncate" id="vocabEx-${i}">"${v.ex}"</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            {
+                title: "Module 2: Family Tree Detective",
+                subtitle: "Investigate relationships across the family diagram",
+                time: "5 minutes",
+                teacherNotes: `
+                    <h4 class="font-bold text-navy mb-1">Teacher Guide: Family Tree Detective (5 mins)</h4>
+                    <p class="mb-2">Display the family members. Click on cards to inspect relationships and example sentences.</p>
+                    <p>Conduct the Detective Quiz orally with the class before moving to Listening.</p>
+                `,
+                render: () => `
+                    <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-blue-100 space-y-6 slide-up">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4">
+                            <div>
+                                <h3 class="text-xl font-extrabold text-navy">The Family Tree Detective Board</h3>
+                                <p class="text-xs text-gray-500">Click on any family member below to examine their background and relationship sentences.</p>
+                            </div>
+                            <button onclick="app.openDetectiveQuiz()" class="bg-mediumBlue text-white font-bold px-4 py-2 rounded-xl text-xs hover:bg-blue-600 transition shadow">
+                                <i class="fa-solid fa-magnifying-glass mr-1"></i> Detective Quiz
+                            </button>
+                        </div>
+
+                        <!-- Family Member Cards Grid -->
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                            ${familyMembers.map(m => `
+                                <div onclick="app.inspectMember('${m.id}')" class="bg-softBlue p-4 rounded-2xl border border-blue-200 cursor-pointer hover:bg-blue-100 transition flex flex-col items-center text-center space-y-2 group">
+                                    <div class="w-14 h-14 bg-navy text-white rounded-2xl flex items-center justify-center font-bold text-lg shadow group-hover:scale-105 transition">
+                                        ${m.name.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-navy text-sm">${m.name}</h4>
+                                        <p class="text-[11px] text-mediumBlue font-semibold">${m.relation}</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Module 3: Listening Mission",
+                subtitle: "Teacher Dictation & Comprehension",
+                time: "5 minutes",
+                teacherNotes: `
+                    <h4 class="font-bold text-navy mb-1">Teacher Guide: Listening Mission (5 mins)</h4>
+                    <p class="mb-2"><strong>Instructions:</strong> Read the script below aloud twice at a moderate speed. Pause slightly between sentences.</p>
+                    <div class="bg-amber-50 p-3 rounded-xl border border-amber-200 my-2 text-xs font-mono">
+                        "Hello! This is a story about Nathan and Sally. They were married in nineteen sixty-eight. Nathan was a photographer. Sally was a doctor. They were young when they got married. Their family grew, and their children had their own families."
+                    </div>
+                    <p>Have students answer questions in their notebooks, then click 'Show Answers' to verify.</p>
+                `,
+                render: () => {
+                    const questions = [
+                        { q: "1. When were Nathan and Sally married?", a: "In 1968 (Nineteen sixty-eight)." },
+                        { q: "2. Was Nathan a photographer?", a: "Yes, he was." },
+                        { q: "3. Was Sally a doctor?", a: "Yes, she was." },
+                        { q: "4. Were they young when they got married?", a: "Yes, they were." }
+                    ];
+
+                    return `
+                        <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-blue-100 space-y-6 slide-up">
+                            <div class="border-b pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                <div>
+                                    <h3 class="text-xl font-extrabold text-navy">Listening Comprehension Task</h3>
+                                    <p class="text-xs text-gray-500">Teacher will read the story aloud. Listen carefully and answer the questions.</p>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button onclick="app.showTeacherDictation()" class="bg-amber-100 text-amber-800 px-3 py-2 rounded-xl text-xs font-bold hover:bg-amber-200 transition">
+                                        <i class="fa-solid fa-scroll mr-1"></i> View Script in Teacher Mode
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="bg-softBlue p-5 rounded-2xl border border-blue-200 space-y-3">
+                                <div class="flex items-center gap-2 text-navy font-bold text-sm">
+                                    <i class="fa-solid fa-headphones text-mediumBlue"></i> Teacher Dictation Mode Active <button onclick="app.speak(&quot;Hello! This is a story about Nathan and Sally. They were married in nineteen sixty-eight. Nathan was a photographer. Sally was a doctor. They were young when they got married. Their family grew, and their children had their own families.&quot;)" class="ml-auto bg-white text-mediumBlue px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:bg-blue-100"><i class="fa-solid fa-volume-high mr-1"></i> Play Audio</button>
+                                </div>
+                                <p class="text-xs text-gray-600">Students should close their books or look away from text while the teacher reads the dictation script twice.</p>
+                            </div>
+
+                            <div class="space-y-4">
+                                <h4 class="font-bold text-navy text-sm">Listening Questions:</h4>
+                                <div class="space-y-3">
+                                    ${questions.map((item, idx) => `
+                                        <div class="bg-gray-50 p-4 rounded-2xl border border-gray-200 space-y-2">
+                                            <p class="font-semibold text-navy text-sm">${item.q}</p>
+                                            <div class="hidden answer-box pl-3 border-l-2 border-successGreen text-xs text-gray-700 font-medium" id="ans-${idx}">
+                                                <span class="text-successGreen font-bold">Answer:</span> ${item.a}
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end pt-2">
+                                <button onclick="app.toggleListeningAnswers()" id="revealListeningBtn" class="bg-mediumBlue text-white px-5 py-2.5 rounded-xl text-xs font-bold hover:bg-blue-600 transition shadow">
+                                    Show Answers
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            {
+                title: "Module 4: Grammar Lab",
+                subtitle: "Past Simple of Be (was, were, wasn't, weren't)",
+                time: "13 minutes",
+                teacherNotes: `
+                    <h4 class="font-bold text-navy mb-1">Teacher Guide: Grammar Lab (13 mins)</h4>
+                    <p class="mb-2">Thoroughly explain positive, negative, and question structures for <strong>was</strong> and <strong>were</strong>.</p>
+                    <p class="mb-2">Highlight subject-verb agreement: <em>I/He/She/It was</em> vs <em>You/We/They were</em>.</p>
+                    <p>Guide students through Levels 1, 2, and 3 of the Interactive Grammar Practice.</p>
+                `,
+                render: () => `
+                    <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-blue-100 space-y-6 slide-up">
+                        <div class="border-b pb-4">
+                            <h3 class="text-xl font-extrabold text-navy">Grammar Lab: Past Simple of Be</h3>
+                            <p class="text-xs text-gray-500">Mastering was, were, wasn't, weren't, questions, and short answers.</p>
+                        </div>
+
+                        <!-- Theory Section Tabs / Cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Table Card -->
+                            <div class="bg-softBlue p-5 rounded-2xl border border-blue-200 space-y-3">
+                                <h4 class="font-bold text-navy text-sm flex items-center gap-2">
+                                    <i class="fa-solid fa-table text-mediumBlue"></i> Subject & Past Form Table
+                                </h4>
+                                <div class="bg-white rounded-xl p-3 text-xs space-y-1.5 font-mono shadow-inner">
+                                    <div class="flex justify-between border-b pb-1"><span>I / He / She / It</span> <span class="text-mediumBlue font-bold">was</span></div>
+                                    <div class="flex justify-between pt-1"><span>You / We / They</span> <span class="text-mediumBlue font-bold">were</span></div>
+                                </div>
+                                <p class="text-[11px] text-gray-600">Note: Single nouns/names use <strong>was</strong>; plural nouns/names use <strong>were</strong>.</p>
+                            </div>
+
+                            <!-- Formulas Card -->
+                            <div class="bg-softBlue p-5 rounded-2xl border border-blue-200 space-y-3">
+                                <h4 class="font-bold text-navy text-sm flex items-center gap-2">
+                                    <i class="fa-solid fa-book-bookmark text-mediumBlue"></i> Positive & Negative Formulas
+                                </h4>
+                                <div class="text-xs space-y-2 text-gray-700">
+                                    <p><strong>Positive:</strong> Subject + was/were + complement.<br><em>"She was a doctor." / "They were young."</em></p>
+                                    <p><strong>Negative:</strong> Subject + wasn't / weren't + complement.<br><em>"He wasn't at home." / "We weren't classmates."</em></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Questions & Common Mistakes -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-softBlue p-5 rounded-2xl border border-blue-200 space-y-2">
+                                <h4 class="font-bold text-navy text-sm">Questions & Short Answers</h4>
+                                <p class="text-xs text-gray-700"><strong>Formula:</strong> Was/Were + subject + complement?</p>
+                                <ul class="text-xs text-gray-700 list-disc list-inside space-y-1">
+                                    <li><em>"Was she a doctor?"</em> → Yes, she was. / No, she wasn't.</li>
+                                    <li><em>"Were they friends?"</em> → Yes, they were. / No, they weren't.</li>
+                                </ul>
+                            </div>
+                            <div class="bg-amber-50 p-5 rounded-2xl border border-amber-200 space-y-2">
+                                <h4 class="font-bold text-amber-900 text-sm">Common Mistakes to Avoid</h4>
+                                <ul class="text-xs text-amber-800 list-disc list-inside space-y-1">
+                                    <li>❌ "They was young." → <strong class="text-successGreen">✔ "They were young."</strong></li>
+                                    <li>❌ "She were a doctor." → <strong class="text-successGreen">✔ "She was a doctor."</strong></li>
+                                    <li>❌ "They didn't were friends." → <strong class="text-successGreen">✔ "They weren't friends."</strong></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Interactive Grammar Practice Section -->
+                        <div class="space-y-4 pt-4 border-t">
+                            <h4 class="font-bold text-navy text-base">Interactive Grammar Practice</h4>
+                            
+                            <!-- Level 1 -->
+                            <div class="bg-gray-50 p-4 rounded-2xl border border-gray-200 space-y-3">
+                                <div class="font-bold text-xs text-navy uppercase tracking-wider">Level 1: Choose Was or Were</div>
+                                <div class="space-y-2 text-xs">
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white p-3 rounded-xl border">
+                                        <span>1. My grandmother <select id="g1_1" class="border rounded px-2 py-1 font-bold text-mediumBlue"><option value="">--select--</option><option value="was">was</option><option value="were">were</option></select> a teacher.</span>
+                                    </div>
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white p-3 rounded-xl border">
+                                        <span>2. My parents <select id="g1_2" class="border rounded px-2 py-1 font-bold text-mediumBlue"><option value="">--select--</option><option value="was">was</option><option value="were">were</option></select> young in 2000.</span>
+                                    </div>
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white p-3 rounded-xl border">
+                                        <span>3. Nathan <select id="g1_3" class="border rounded px-2 py-1 font-bold text-mediumBlue"><option value="">--select--</option><option value="was">was</option><option value="were">were</option></select> a photographer.</span>
+                                    </div>
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white p-3 rounded-xl border">
+                                        <span>4. Ella and Rick <select id="g1_4" class="border rounded px-2 py-1 font-bold text-mediumBlue"><option value="">--select--</option><option value="was">was</option><option value="were">were</option></select> friends.</span>
+                                    </div>
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white p-3 rounded-xl border">
+                                        <span>5. I <select id="g1_5" class="border rounded px-2 py-1 font-bold text-mediumBlue"><option value="">--select--</option><option value="was">was</option><option value="were">were</option></select> at school yesterday.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Level 2 -->
+                            <div class="bg-gray-50 p-4 rounded-2xl border border-gray-200 space-y-3">
+                                <div class="font-bold text-xs text-navy uppercase tracking-wider">Level 2: Positive or Negative (was / wasn't / were / weren't)</div>
+                                <div class="space-y-2 text-xs">
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white p-3 rounded-xl border">
+                                        <span>1. She <select id="g2_1" class="border rounded px-2 py-1 font-bold text-mediumBlue"><option value="">--select--</option><option value="was">was</option><option value="wasnt">wasn't</option></select> a doctor. (positive)</span>
+                                    </div>
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white p-3 rounded-xl border">
+                                        <span>2. They <select id="g2_2" class="border rounded px-2 py-1 font-bold text-mediumBlue"><option value="">--select--</option><option value="were">were</option><option value="werent">werent</option></select> friends. (negative)</span>
+                                    </div>
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white p-3 rounded-xl border">
+                                        <span>3. He <select id="g2_3" class="border rounded px-2 py-1 font-bold text-mediumBlue"><option value="">--select--</option><option value="was">was</option><option value="wasnt">wasn't</option></select> young. (negative)</span>
+                                    </div>
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white p-3 rounded-xl border">
+                                        <span>4. We <select id="g2_4" class="border rounded px-2 py-1 font-bold text-mediumBlue"><option value="">--select--</option><option value="were">were</option><option value="werent">werent</option></select> at school. (positive)</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end">
+                                <button onclick="app.checkGrammarPractice()" class="bg-mediumBlue text-white px-6 py-2.5 rounded-xl text-xs font-bold hover:bg-blue-600 transition shadow">
+                                    Check Grammar Answers
+                                </button>
+                            </div>
+                            <div id="grammarFeedback" class="hidden p-4 rounded-xl text-xs font-bold"></div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Module 5: Years and Dates",
+                subtitle: "Pronouncing Years, Decades, and Ordinal Dates",
+                time: "7 minutes",
+                teacherNotes: `
+                    <h4 class="font-bold text-navy mb-1">Teacher Guide: Years and Dates (7 mins)</h4>
+                    <p class="mb-2">Explain how years are split in English (e.g., 19-48 = nineteen forty-eight). Note variations for 2000 onwards (two thousand vs twenty ten).</p>
+                    <p>Practice ordinal dates (1st, 2nd, 3rd, 4th, etc.) and month naming.</p>
+                `,
+                render: () => {
+                    const yearCards = [
+                        { y: "1945", p: "nineteen forty-five" },
+                        { y: "1968", p: "nineteen sixty-eight" },
+                        { y: "1989", p: "nineteen eighty-nine" },
+                        { y: "1999", p: "nineteen ninety-nine" },
+                        { y: "2000", p: "two thousand" },
+                        { y: "2002", p: "two thousand and two" },
+                        { y: "2009", p: "two thousand and nine" },
+                        { y: "2010", p: "two thousand and ten / twenty ten" },
+                        { y: "2011", p: "two thousand and eleven / twenty eleven" },
+                        { y: "2026", p: "twenty twenty-six" }
+                    ];
+
+                    return `
+                        <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-blue-100 space-y-6 slide-up">
+                            <div class="border-b pb-4">
+                                <h3 class="text-xl font-extrabold text-navy">Years and Dates Time Machine</h3>
+                                <p class="text-xs text-gray-500">Click any year on the timeline to reveal its correct English pronunciation.</p>
+                            </div>
+
+                            <!-- Interactive Year Timeline -->
+                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                                ${yearCards.map((yc, i) => `
+                                    <div onclick="app.revealYear('${yc.y}')" class="bg-softBlue p-4 rounded-2xl border border-blue-200 cursor-pointer hover:bg-blue-100 transition text-center space-y-1 group">
+                                        <div class="text-base font-extrabold text-navy group-hover:text-mediumBlue">${yc.y}</div>
+                                        <div class="text-[11px] text-gray-600 font-medium min-h-8 flex items-center justify-center gap-2" id="y-text-${yc.y}">
+                                            [ Click to Read ]
+                                        </div><button type="button" onclick="event.stopPropagation(); app.speakYear('${yc.y}')" class="mt-1 bg-white text-mediumBlue rounded-full px-3 py-1 text-xs font-bold shadow-sm hover:bg-blue-100"><i class="fa-solid fa-volume-high mr-1"></i> Listen</button>
+                                    </div>
+                                `).join('')}
+                            </div>
+
+                            <!-- Ordinal Dates Section -->
+                            <div class="bg-softBlue p-5 rounded-2xl border border-blue-200 space-y-3">
+                                <h4 class="font-bold text-navy text-sm flex items-center gap-2">
+                                    <i class="fa-solid fa-calendar-days text-mediumBlue"></i> Ordinal Dates & Months
+                                </h4>
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                                    <div class="bg-white p-3 rounded-xl shadow-sm"><strong>1st</strong>: first</div>
+                                    <div class="bg-white p-3 rounded-xl shadow-sm"><strong>2nd</strong>: second</div>
+                                    <div class="bg-white p-3 rounded-xl shadow-sm"><strong>3rd</strong>: third</div>
+                                    <div class="bg-white p-3 rounded-xl shadow-sm"><strong>4th</strong>: fourth</div>
+                                    <div class="bg-white p-3 rounded-xl shadow-sm"><strong>16th</strong>: sixteenth</div>
+                                    <div class="bg-white p-3 rounded-xl shadow-sm"><strong>25th</strong>: twenty-fifth</div>
+                                </div>
+                                <p class="text-xs text-gray-700 italic">Example: <strong>16 July</strong> = "the sixteenth of July" or "July the sixteenth".</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            {
+                title: "Module 6: Speaking Mission",
+                subtitle: "Talking about Family and the Past",
+                time: "5 minutes",
+                teacherNotes: `
+                    <h4 class="font-bold text-navy mb-1">Teacher Guide: Speaking Mission (5 mins)</h4>
+                    <p class="mb-2">Have students practice sentences using the sentence starters below in pairs or with fictional characters.</p>
+                    <p>Encourage volunteers to speak in front of the class. Praise fluency and structure accuracy.</p>
+                `,
+                render: () => `
+                    <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-blue-100 space-y-6 slide-up">
+                        <div class="border-b pb-4">
+                            <h3 class="text-xl font-extrabold text-navy">Speaking Mission: Family & Past Stories</h3>
+                            <p class="text-xs text-gray-500">Practice speaking aloud using sentence starters and past simple forms.</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-softBlue p-5 rounded-2xl border border-blue-200 space-y-3">
+                                <h4 class="font-bold text-navy text-sm">Sentence Starters</h4>
+                                <ul class="text-xs space-y-2 text-gray-700 font-medium">
+                                    <li class="bg-white p-2.5 rounded-xl border">"My grandfather was born in ____."</li>
+                                    <li class="bg-white p-2.5 rounded-xl border">"My grandmother was born in ____."</li>
+                                    <li class="bg-white p-2.5 rounded-xl border">"My parents were young in ____."</li>
+                                    <li class="bg-white p-2.5 rounded-xl border">"My family was ____ in ____."</li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-softBlue p-5 rounded-2xl border border-blue-200 space-y-3">
+                                <h4 class="font-bold text-navy text-sm">Pair Discussion Questions</h4>
+                                <ul class="text-xs space-y-2 text-gray-700 list-disc list-inside">
+                                    <li>When were you born?</li>
+                                    <li>Where were you born?</li>
+                                    <li>Who was your first teacher?</li>
+                                    <li>What was your favourite subject?</li>
+                                    <li>Were you happy at school?</li>
+                                </ul>
+                                <div class="pt-2">
+                                    <button onclick="app.revealSpeakingExample()" class="bg-mediumBlue text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-blue-600 transition shadow">
+                                        Reveal Example Answer
+                                    </button>
+                                </div>
+                                <div id="speakingExampleBox" class="hidden bg-white p-3 rounded-xl border text-xs text-gray-700 italic">
+                                    "My grandfather was born in 1960. My parents were young in 2000, and my first teacher was Mr. Davis."
+                                    <button onclick="app.speak(&quot;My grandfather was born in nineteen sixty. My parents were young in two thousand, and my first teacher was Mr. Davis.&quot;)" class="mt-2 bg-softBlue text-mediumBlue px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fa-solid fa-volume-high mr-1"></i> Listen to Example</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Module 7: Final Challenge",
+                subtitle: "10-Question Comprehensive Evaluation",
+                time: "8 minutes",
+                teacherNotes: `
+                    <h4 class="font-bold text-navy mb-1">Teacher Guide: Final Challenge (8 mins)</h4>
+                    <p class="mb-2">Students complete the 10-question evaluation. Project the questions on screen and have students vote or write down answers.</p>
+                    <p>Scores are calculated automatically out of 100 points.</p>
+                `,
+                render: () => {
+                    const quizQuestions = [
+                        { id: 1, q: "What is your mother's mother?", options: ["Aunt", "Grandmother", "Cousin"], correct: 1 },
+                        { id: 2, q: "Nathan and Sally ___ married in 1968.", options: ["was", "were", "are"], correct: 1 },
+                        { id: 3, q: "She ___ a doctor in 1980.", options: ["were", "is", "was"], correct: 2 },
+                        { id: 4, q: "Which sentence is correct?", options: ["They was friends.", "They were friends.", "They is friends."], correct: 1 },
+                        { id: 5, q: "Choose the correct negative sentence.", options: ["She weren't a doctor.", "She didn't was a doctor.", "She wasn't a doctor."], correct: 2 },
+                        { id: 6, q: "___ they at school together?", options: ["Was", "Were", "Did"], correct: 1 },
+                        { id: 7, q: "How do you say 1945?", options: ["Nineteen forty-five.", "Fourteen ninety-five.", "Nineteen four five."], correct: 0 },
+                        { id: 8, q: "How do you say 1968?", options: ["Sixteen sixty-eight.", "Nineteen sixty-eight.", "Nineteen six eight."], correct: 1 },
+                        { id: 9, q: "What is your father's brother?", options: ["Uncle", "Cousin", "Grandson"], correct: 0 },
+                        { id: 10, q: "Read: 'Nathan and Sally were married in 1968.' When were they married?", options: ["In 1945.", "In 1989.", "In 1968."], correct: 2 }
+                    ];
+
+                    if (state.quizSubmitted) {
+                        let score = 0;
+                        quizQuestions.forEach(q => {
+                            if (state.quizAnswers[q.id] === q.correct) score += 10;
+                        });
+                        return `
+                            <div class="bg-white rounded-3xl p-8 shadow-sm border border-blue-100 text-center space-y-6 slide-up">
+                                <div class="w-20 h-20 bg-successGreen text-white rounded-full flex items-center justify-center text-4xl mx-auto shadow-lg">
+                                    <i class="fa-solid fa-award"></i>
+                                </div>
+                                <div class="space-y-2">
+                                    <h3 class="text-2xl font-extrabold text-navy">Challenge Completed!</h3>
+                                    <p class="text-sm text-gray-600">Your Final Score:</p>
+                                    <div class="text-5xl font-black text-mediumBlue">${score} / 100</div>
+                                </div>
+                                <p class="text-xs text-gray-500 max-w-md mx-auto">Great job completing all missions! You have successfully mastered family vocabulary, past simple be, and years.</p>
+                                <button onclick="app.restartQuiz()" class="bg-navy text-white px-6 py-3 rounded-2xl text-xs font-bold hover:bg-blue-900 transition shadow">
+                                    Restart Challenge
+                                </button>
+                            </div>
+                        `;
+                    }
+
+                    return `
+                        <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-blue-100 space-y-6 slide-up">
+                            <div class="border-b pb-4 flex justify-between items-center">
+                                <div>
+                                    <h3 class="text-xl font-extrabold text-navy">Final Challenge Evaluation</h3>
+                                    <p class="text-xs text-gray-500">Answer all 10 questions to test your knowledge.</p>
+                                </div>
+                                <span class="bg-warmCream text-navy font-bold px-3 py-1 rounded-xl text-xs">10 Points per Question</span>
+                            </div>
+
+                            <div class="space-y-6">
+                                ${quizQuestions.map((q, idx) => `
+                                    <div class="bg-softBlue p-5 rounded-2xl border border-blue-200 space-y-3">
+                                        <h4 class="font-bold text-navy text-sm">${idx + 1}. ${q.q}</h4>
+                                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                            ${q.options.map((opt, optIdx) => `
+                                                <button onclick="app.selectQuizAnswer(${q.id}, ${optIdx})" id="q${q.id}-opt${optIdx}" class="quiz-opt-${q.id} text-left p-3 rounded-xl border text-xs font-medium transition ${state.quizAnswers[q.id] === optIdx ? 'bg-mediumBlue text-white border-mediumBlue font-bold shadow' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}">
+                                                    ${opt}
+                                                </button>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+
+                            <div class="flex justify-end pt-4">
+                                <button onclick="app.submitQuiz()" class="bg-successGreen hover:bg-green-600 text-white font-bold px-8 py-3 rounded-2xl text-xs shadow-lg transition">
+                                    Submit Final Challenge
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            {
+                title: "Module 8: Summary & Exit Ticket",
+                subtitle: "Lesson Review & Reflection",
+                time: "2 minutes",
+                teacherNotes: `
+                    <h4 class="font-bold text-navy mb-1">Teacher Guide: Summary & Exit Ticket (2 mins)</h4>
+                    <p class="mb-2">Review core takeaways with the class. Ask students to orally answer the three reflection questions before dismissing.</p>
+                `,
+                render: () => `
+                    <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-blue-100 space-y-6 slide-up">
+                        <div class="border-b pb-4">
+                            <h3 class="text-xl font-extrabold text-navy">Lesson Summary & Exit Ticket</h3>
+                            <p class="text-xs text-gray-500">Key takeaways and reflection questions for students.</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-softBlue p-5 rounded-2xl border border-blue-200 space-y-3">
+                                <h4 class="font-bold text-navy text-sm"><i class="fa-solid fa-circle-check text-successGreen mr-1"></i> Key Takeaways</h4>
+                                <ul class="text-xs space-y-2 text-gray-700 list-disc list-inside">
+                                    <li>Family vocabulary describes family relationships.</li>
+                                    <li>Use <strong>was</strong> with I, he, she, and it.</li>
+                                    <li>Use <strong>were</strong> with you, we, and they.</li>
+                                    <li>Use <strong>wasn't</strong> and <strong>weren't</strong> for negatives.</li>
+                                    <li>Put Was/Were at the front for questions.</li>
+                                    <li>Years have specific accepted pronunciations.</li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-softBlue p-5 rounded-2xl border border-blue-200 space-y-3">
+                                <h4 class="font-bold text-navy text-sm"><i class="fa-solid fa-comments text-mediumBlue mr-1"></i> Exit Ticket Reflection</h4>
+                                <ol class="text-xs space-y-3 text-gray-700 list-decimal list-inside font-medium">
+                                    <li>What is one new family word you learned today?</li>
+                                    <li>When do we use <strong>was</strong> vs <strong>were</strong>?</li>
+                                    <li>How do you pronounce the year <strong>1968</strong>?</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <div class="bg-gradient-to-r from-navy to-mediumBlue text-white p-6 rounded-3xl text-center space-y-2 shadow-lg">
+                            <h4 class="text-xl font-extrabold">Mission Complete!</h4>
+                            <p class="text-xs text-warmCream font-medium">You are now an official Family Time Detective!</p>
+                        </div>
+                    </div>
+                `
+            }
+        ];
+
+        // Core App Controller Methods
+        const app = {
+            // Uses the browser's built-in speech engine. No API key or external audio service is needed.
+            speak(text) {
+                if (!("speechSynthesis" in window) || !("SpeechSynthesisUtterance" in window)) {
+                    this.showMessage("Audio is not supported", "Browser ini belum mendukung fitur suara. Coba buka media menggunakan Google Chrome atau Microsoft Edge versi terbaru.");
+                    return;
+                }
+                if (!text || !String(text).trim()) return;
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(String(text).trim());
+                const voices = window.speechSynthesis.getVoices();
+                const englishVoices = voices.filter(v => /^en(-|_)/i.test(v.lang));
+                const preferredVoice = englishVoices.find(v => /en-GB/i.test(v.lang)) || englishVoices.find(v => /en-US/i.test(v.lang)) || englishVoices[0];
+                if (preferredVoice) utterance.voice = preferredVoice;
+                utterance.lang = preferredVoice ? preferredVoice.lang : "en-GB";
+                utterance.rate = 0.88;
+                utterance.pitch = 1;
+                utterance.volume = 1;
+                window.speechSynthesis.speak(utterance);
+            },
+            stopSpeaking() {
+                if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+            },
+            speakYear(year) {
+                const pronunciations = {
+                    "1945": "nineteen forty-five", "1968": "nineteen sixty-eight",
+                    "1989": "nineteen eighty-nine", "1999": "nineteen ninety-nine",
+                    "2000": "two thousand", "2002": "two thousand and two",
+                    "2009": "two thousand and nine", "2010": "two thousand and ten, or twenty ten",
+                    "2011": "two thousand and eleven, or twenty eleven", "2026": "twenty twenty-six"
+                };
+                this.speak(pronunciations[year] || String(year));
+            },
+            init() {
+                this.render();
+            },
+            navigateTo(modIdx) {
+                if (modIdx < 0 || modIdx >= modules.length) return;
+                state.currentModule = modIdx;
+                this.render();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            },
+            nextModule() {
+                if (state.currentModule < modules.length - 1) {
+                    this.navigateTo(state.currentModule + 1);
+                }
+            },
+            prevModule() {
+                if (state.currentModule > 0) {
+                    this.navigateTo(state.currentModule - 1);
+                }
+            },
+            render() {
+                const mod = modules[state.currentModule];
+                
+                // Update Status Bar
+                document.getElementById('moduleBadge').innerText = `Module ${state.currentModule} / 8`;
+                document.getElementById('moduleTitleHeader').innerText = mod.title;
+                document.getElementById('moduleTimeHeader').innerHTML = `<i class="fa-regular fa-clock mr-1"></i> Estimated Time: ${mod.time}`;
+                
+                // Update Nav Buttons
+                document.getElementById('prevBtn').disabled = state.currentModule === 0;
+                document.getElementById('prevBtn').classList.toggle('opacity-50', state.currentModule === 0);
+                document.getElementById('nextBtn').disabled = state.currentModule === modules.length - 1;
+                document.getElementById('nextBtn').classList.toggle('opacity-50', state.currentModule === modules.length - 1);
+
+                // Highlight active nav in header
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    const m = parseInt(btn.getAttribute('data-mod'));
+                    if (m === state.currentModule) {
+                        btn.className = 'nav-btn px-3 py-1.5 rounded-lg transition bg-white/30 font-bold shadow-inner';
+                    } else {
+                        btn.className = 'nav-btn px-3 py-1.5 rounded-lg transition hover:bg-white/20';
+                    }
+                });
+
+                // Render Main Content
+                document.getElementById('mainContent').innerHTML = mod.render();
+
+                // Render Teacher Modal Content
+                document.getElementById('teacherModalContent').innerHTML = mod.teacherNotes;
+            },
+            toggleTeacherMode() {
+                state.teacherModeOpen = !state.teacherModeOpen;
+                const modal = document.getElementById('teacherModal');
+                modal.classList.toggle('hidden', !state.teacherModeOpen);
+            },
+            togglePresentMode() {
+                state.presentMode = !state.presentMode;
+                const header = document.getElementById('mainHeader');
+                const btnText = document.getElementById('presentModeBtnText');
+                if (state.presentMode) {
+                    header.classList.add('hidden');
+                    btnText.innerText = "Exit Present";
+                } else {
+                    header.classList.remove('hidden');
+                    btnText.innerText = "Present";
+                }
+            },
+            showMessage(title, body) {
+                document.getElementById('msgTitle').innerText = title;
+                document.getElementById('msgBody').innerText = body;
+                document.getElementById('messageModal').classList.remove('hidden');
+            },
+            closeMessage() {
+                document.getElementById('messageModal').classList.add('hidden');
+            },
+            flipVocab(idx) {
+                const textElem = document.getElementById(`vocabText-${idx}`);
+                const subElem = document.getElementById(`vocabSub-${idx}`);
+                const exElem = document.getElementById(`vocabEx-${idx}`);
+                
+                if (subElem.classList.contains('hidden')) {
+                    subElem.classList.remove('hidden');
+                } else {
+                    subElem.classList.add('hidden');
+                }
+            },
+            showVocabQuickMatch() {
+                this.showMessage("Quick Match Activity", "Teacher can ask students to match English family words with Indonesian meanings out loud across the classroom.");
+            },
+            inspectMember(id) {
+                const member = familyMembers.find(m => m.id === id);
+                if (member) {
+                    this.showMessage(member.name + " (" + member.relation + ")", member.desc + "\n\nDetails: " + member.details);
+                }
+            },
+            openDetectiveQuiz() {
+                this.showMessage("Detective Quiz Time", "Teacher asks the class: 1. Who is Greg's mother? (Mary) 2. Who is Mary's son? (Greg) 3. Who is Ella's brother? (Greg) 4. Who is Nathan's wife? (Sally)");
+            },
+            showTeacherDictation() {
+                this.toggleTeacherMode();
+            },
+            toggleListeningAnswers() {
+                const boxes = document.querySelectorAll('.answer-box');
+                const btn = document.getElementById('revealListeningBtn');
+                boxes.forEach(b => b.classList.toggle('hidden'));
+                if (btn.innerText === "Show Answers") {
+                    btn.innerText = "Hide Answers";
+                } else {
+                    btn.innerText = "Show Answers";
+                }
+            },
+            checkGrammarPractice() {
+                const l1_1 = document.getElementById('g1_1').value;
+                const l1_2 = document.getElementById('g1_2').value;
+                const l1_3 = document.getElementById('g1_3').value;
+                const l1_4 = document.getElementById('g1_4').value;
+                const l1_5 = document.getElementById('g1_5').value;
+
+                let score = 0;
+                if (l1_1 === 'was') score++;
+                if (l1_2 === 'were') score++;
+                if (l1_3 === 'was') score++;
+                if (l1_4 === 'were') score++;
+                if (l1_5 === 'was') score++;
+
+                const fb = document.getElementById('grammarFeedback');
+                fb.classList.remove('hidden');
+                fb.className = `p-4 rounded-xl text-xs font-bold ${score === 5 ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`;
+                fb.innerText = `Grammar Practice Score: ${score} / 5 correct! Correct answers: 1. was, 2. were, 3. was, 4. were, 5. was.`;
+            },
+            revealYear(year) {
+                const elem = document.getElementById(`y-text-${year}`);
+                const pronunciations = {
+                    "1945": "nineteen forty-five",
+                    "1968": "nineteen sixty-eight",
+                    "1989": "nineteen eighty-nine",
+                    "1999": "nineteen ninety-nine",
+                    "2000": "two thousand",
+                    "2002": "two thousand and two",
+                    "2009": "two thousand and nine",
+                    "2010": "two thousand and ten / twenty ten",
+                    "2011": "two thousand and eleven / twenty eleven",
+                    "2026": "twenty twenty-six"
+                };
+                elem.innerText = pronunciations[year] || year;
+                elem.classList.add('text-mediumBlue', 'font-bold');
+            },
+            revealSpeakingExample() {
+                const box = document.getElementById('speakingExampleBox');
+                box.classList.toggle('hidden');
+            },
+            selectQuizAnswer(qId, optIdx) {
+                state.quizAnswers[qId] = optIdx;
+                // re-render current module to update button styles
+                this.render();
+            },
+            submitQuiz() {
+                state.quizSubmitted = true;
+                this.render();
+            },
+            restartQuiz() {
+                state.quizAnswers = {};
+                state.quizSubmitted = false;
+                this.render();
+            }
+        };
+
+        // Initialize on load
+        window.onload = () => {
+            app.init();
+        };
+    </script>
+</body>
+</html>
