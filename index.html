@@ -72,6 +72,9 @@
                 <button onclick="app.toggleTeacherMode()" class="bg-warmCream text-navy font-bold px-3 py-1.5 rounded-xl text-xs hover:bg-amber-300 transition shadow flex items-center gap-1.5">
                     <i class="fa-solid fa-chalkboard-user"></i> <span id="teacherModeBtnText">Teacher Mode</span>
                 </button>
+                <button onclick="app.printLKM()" class="bg-white text-navy font-bold px-3 py-1.5 rounded-xl text-xs hover:bg-softBlue transition shadow flex items-center gap-1.5 border border-blue-200" title="Cetak Lembar Kerja Murid">
+                    <i class="fa-solid fa-print"></i> <span>Cetak LKM</span>
+                </button>
                 <button onclick="app.togglePresentMode()" id="presentModeBtn" class="bg-mediumBlue text-white font-bold px-3 py-1.5 rounded-xl text-xs hover:bg-blue-600 transition shadow flex items-center gap-1.5">
                     <i class="fa-solid fa-expand"></i> <span id="presentModeBtnText">Present</span>
                 </button>
@@ -849,6 +852,113 @@
                     header.classList.remove('hidden');
                     btnText.innerText = "Present";
                 }
+            },
+            // Create a print-ready student worksheet in a separate window.
+            // The interactive MPI remains unchanged; only the worksheet is sent to print.
+            printLKM() {
+                const worksheet = `
+                    <!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>Student Worksheet - The Family Time Machine</title>
+                        <style>
+                            * { box-sizing: border-box; }
+                            body { font-family: Arial, sans-serif; color: #172b45; margin: 0; padding: 24px; font-size: 12px; line-height: 1.45; }
+                            .sheet { max-width: 800px; margin: 0 auto; }
+                            h1 { font-size: 21px; text-align: center; margin: 0 0 3px; letter-spacing: .4px; }
+                            .subtitle { text-align: center; font-size: 12px; margin: 0 0 16px; }
+                            .identity { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 22px; margin: 14px 0 18px; }
+                            .line { border-bottom: 1px solid #333; min-height: 20px; display: inline-block; min-width: 150px; }
+                            h2 { font-size: 14px; background: #e5f1ff; padding: 6px 8px; border-left: 4px solid #477db3; margin: 15px 0 8px; }
+                            p { margin: 5px 0; }
+                            .question { margin: 8px 0 10px; }
+                            .answer { border-bottom: 1px solid #777; height: 22px; margin-top: 4px; }
+                            .short { display: inline-block; border-bottom: 1px solid #777; min-width: 115px; height: 18px; }
+                            .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 22px; }
+                            table { border-collapse: collapse; width: 100%; margin: 8px 0; }
+                            th, td { border: 1px solid #777; padding: 6px; text-align: left; }
+                            th { background: #f2f6fb; }
+                            .footer { margin-top: 18px; font-size: 10px; text-align: center; color: #555; }
+                            @media print { body { padding: 0; } .sheet { max-width: none; } }
+                        </style>
+                    </head>
+                    <body>
+                      <main class="sheet">
+                        <h1>THE FAMILY TIME MACHINE</h1>
+                        <p class="subtitle">Grade 8 English | Student Worksheet (LKM)</p>
+                        <div class="identity">
+                          <div>Name: <span class="line"></span></div>
+                          <div>Class: <span class="line"></span></div>
+                          <div>Date: <span class="line"></span></div>
+                          <div>Score: <span class="line"></span></div>
+                        </div>
+
+                        <p><strong>Learning Goals:</strong> Identify family relationships, use <em>was/were</em> correctly, and read years in English.</p>
+
+                        <h2>A. Family Vocabulary</h2>
+                        <p>Complete the Indonesian meaning of each word.</p>
+                        <table>
+                          <tr><th>No.</th><th>English</th><th>Indonesian Meaning</th></tr>
+                          <tr><td>1</td><td>grandfather</td><td></td></tr>
+                          <tr><td>2</td><td>grandmother</td><td></td></tr>
+                          <tr><td>3</td><td>daughter</td><td></td></tr>
+                          <tr><td>4</td><td>uncle</td><td></td></tr>
+                          <tr><td>5</td><td>cousin</td><td></td></tr>
+                        </table>
+
+                        <h2>B. Family Tree Detective</h2>
+                        <p>Answer the questions based on the family story and the MPI.</p>
+                        <div class="question">1. Who is Greg's mother?<div class="answer"></div></div>
+                        <div class="question">2. Who is Ella's brother?<div class="answer"></div></div>
+                        <div class="question">3. Who is Nathan's wife?<div class="answer"></div></div>
+
+                        <h2>C. Grammar Lab: Was or Were?</h2>
+                        <p>Choose the correct form to complete each sentence.</p>
+                        <div class="question">1. My grandmother <span class="short"></span> a teacher.</div>
+                        <div class="question">2. My parents <span class="short"></span> young in 2000.</div>
+                        <div class="question">3. Nathan <span class="short"></span> a photographer.</div>
+                        <div class="question">4. Ella and Rick <span class="short"></span> friends.</div>
+                        <div class="question">5. I <span class="short"></span> at school yesterday.</div>
+                        <p><strong>Make it negative:</strong> They were friends. → <span class="line"></span></p>
+                        <p><strong>Make it a question:</strong> She was a doctor. → <span class="line"></span></p>
+
+                        <h2>D. Years and Dates</h2>
+                        <p>Write these years in English words.</p>
+                        <div class="two-col">
+                          <div>1. 1945: <span class="line"></span></div>
+                          <div>2. 1968: <span class="line"></span></div>
+                          <div>3. 2000: <span class="line"></span></div>
+                          <div>4. 2026: <span class="line"></span></div>
+                        </div>
+
+                        <h2>E. Listening Mission</h2>
+                        <p>Listen to your teacher and answer the questions.</p>
+                        <div class="question">1. When were Nathan and Sally married?<div class="answer"></div></div>
+                        <div class="question">2. Was Nathan a photographer?<div class="answer"></div></div>
+                        <div class="question">3. Was Sally a doctor?<div class="answer"></div></div>
+
+                        <h2>F. Speaking & Reflection</h2>
+                        <p>Complete the sentences about your family. You may use a fictional example if you prefer.</p>
+                        <p>1. My grandfather was born in <span class="short"></span>.</p>
+                        <p>2. My parents were young in <span class="short"></span>.</p>
+                        <p>3. One new word I learned today is <span class="short"></span>.</p>
+                        <p>4. We use <em>was</em> with <span class="line"></span> and <em>were</em> with <span class="line"></span>.</p>
+
+                        <div class="footer">The Family Time Machine | Grade 8 English Learning Media</div>
+                      </main>
+                      <script>window.addEventListener('load', function(){ window.focus(); window.print(); });<\/script>
+                    </body>
+                    </html>`;
+                const printWindow = window.open('', '_blank');
+                if (!printWindow) {
+                    this.showMessage("Print window blocked", "Izinkan pop-up untuk media ini, lalu klik Cetak LKM kembali.");
+                    return;
+                }
+                printWindow.document.open();
+                printWindow.document.write(worksheet);
+                printWindow.document.close();
             },
             showMessage(title, body) {
                 document.getElementById('msgTitle').innerText = title;
